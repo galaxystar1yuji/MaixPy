@@ -245,7 +245,7 @@ mp_obj_t wav_play(audio_t* audio)
 			for(int i=0; i<read_num/sizeof(int16_t); ++i)
 			{
 				src[i] = (int16_t)(src[i] * audio->volume / 100);
-				dst[i] = (src[i]<<16) | src[i];
+				dst[i] = ((int32_t)src[i]<<16) | ((int32_t)src[i] & 0xFFFF);
 			}
 			play_obj->audio_buf[play_obj->read_order].len = read_num*2;
 		}
@@ -258,7 +258,7 @@ mp_obj_t wav_play(audio_t* audio)
 				LSB_audio = (short)(LSB_audio * audio->volume / 100);
 				MSB_audio = audio_buf[i] >> 16;
 				MSB_audio = (short)(MSB_audio * audio->volume / 100);
-				audio_buf[i] = ( MSB_audio << 16 ) | LSB_audio;
+				audio_buf[i] = ( (int32_t)MSB_audio << 16 ) | ((int32_t)LSB_audio & 0xFFFF);
 			}
 			play_obj->audio_buf[play_obj->read_order].len = read_num;
 		}
